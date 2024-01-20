@@ -2,6 +2,7 @@ import useAxiosPublic from "../../Hooks/useAxiosPublic";
 import { IoIosArrowForward } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import Banner from "../Banner/Banner";
 
 const MainPageHeader = () => {
 
@@ -33,7 +34,7 @@ const MainPageHeader = () => {
 
     return (
         <div onMouseLeave={() => setShowSub(false)} className="flex">
-            <div className="flex flex-col w-1/4 bg-white py-5 border-2 border-t-0 shadow h-fit">
+            <div className="flex flex-col w-full bg-white py-5 border-2 border-t-0 shadow h-fit">
                 {
                     allMainCategories?.map(mainCategory => {
                         return <div key={mainCategory._id}>
@@ -50,10 +51,10 @@ const MainPageHeader = () => {
                 }
             </div>
             <div className="flex-grow relative">
-                <div onMouseLeave={() => setShowSub(false)} className={`w-full min-h-full bg-white border-2 absolute left-0 top-0 p-5 grid grid-cols-4 gap-5 ${showSub ? "" : "hidden"}`}>
+                <div onMouseLeave={() => setShowSub(false)} className={`w-full min-h-full bg-white border-2 z-50 absolute left-0 top-0 p-5 grid grid-cols-4 gap-5 ${showSub ? "" : "hidden"}`}>
                     {
                         subCategories?.map(subCategory => {
-                            return <div key={subCategory._id}>
+                            return <div key={subCategory._id} className="">
                                 <Link to={`subcategoryproducts/${subCategory.subcategory}`}>
                                     <button className="font-bold text-sm text-left">{subCategory.subcategory}</button>
                                 </Link>
@@ -70,7 +71,10 @@ const MainPageHeader = () => {
                         })
                     }
                 </div>
-                <img className="w-full pr-[2px] border-t" src="https://i.ibb.co/Vj26KbZ/banner1.jpg" alt="" />
+                {/* <img className="w-full pr-[2px] border-t" src="https://i.ibb.co/Vj26KbZ/banner1.jpg" alt="" /> */}
+                <div className="w-full">
+                    <Banner></Banner>
+                </div>
             </div>
         </div>
     );

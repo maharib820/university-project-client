@@ -163,7 +163,7 @@ const ProductDetailsPage = () => {
                     <div className="flex-1">
                         <img src={datas?.productpictures[imgNum]} alt="" />
                     </div>
-                    <div className={`absolute right-0 ${datas?.productdiscount > 0 ? "" : "hidden"}`}><button className="bg-orange-600 px-4 text-white">-{datas?.productdiscount}%</button></div>
+                    <div className={`absolute right-10 ${datas?.productdiscount > 0 ? "" : "hidden"}`}><button className="bg-orange-600 px-4 text-white">-{datas?.productdiscount}%</button></div>
                 </div>
                 <div className="flex-1 pt-5">
                     <h2 className="text-2xl">{datas?.productname}</h2>
@@ -184,7 +184,7 @@ const ProductDetailsPage = () => {
                         <pre>{datas?.productinfo}</pre>
                     </div>
                     {
-                        datas?.quantity > 0 ?
+                        datas.productstatus === "Active" ? datas?.quantity > 0 ?
                             <div className="mt-8 flex items-center gap-4">
                                 <div className="flex items-center gap-2">
                                     <button onClick={handleDecrease}><FiMinus></FiMinus></button>
@@ -203,7 +203,7 @@ const ProductDetailsPage = () => {
                                         <button onClick={() => handleWishlist(datas)}><FaRegHeart className="text-red-600 text-2xl"></FaRegHeart></button>
                                 }
                             </div> :
-                            <p>Stock Out</p>
+                            <p>Stock Out</p> : <p>Discontinued</p>
                     }
                 </div>
             </div>

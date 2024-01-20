@@ -45,7 +45,7 @@ const Navbar = () => {
         });
     }
 
-    const status = useRole();
+    const [status] = useRole();
 
     const axiosPublic = useAxiosPublic();
 
@@ -285,10 +285,10 @@ const Navbar = () => {
                                         <div className="dropdown-content z-50 menu shadow bg-white w-52 -right-24 md:left-0 rounded-b-md border">
                                             <div>
                                                 {
-                                                    status?.status === "admin" ?
+                                                    status?.status === "admin" || status?.status === "moderator"  ?
                                                         <div>
                                                             <div className="flex items-center justify-between">
-                                                                <p className="font-semibold">Admin</p>
+                                                                <p className="font-semibold">Administrator</p>
                                                                 <Link to={"dashboard/admindashboard"}><h1 className="font-bold text-[#2a55e5]">Dashboard</h1></Link>
                                                             </div>
                                                             <div className="divider w-full"></div>

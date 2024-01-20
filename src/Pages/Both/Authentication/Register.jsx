@@ -5,19 +5,19 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Helmet } from "react-helmet-async";
-import useAxiosPublic from "../../../Hooks/useAxiosPublic";
+import useAxiosPrivate from "../../../Hooks/useAxiosPrivate";
 import useAuth from "../../../Hooks/useAuth";
 import { useState } from "react";
 import Swal from "sweetalert2";
 
 const Register = () => {
 
-    const axiosPublic = useAxiosPublic();
+    const axiosPrivate = useAxiosPrivate();
 
     const imgbbKey = import.meta.env.VITE_imagebb_key;
     const imgbbAPI = `https://api.imgbb.com/1/upload?key=${imgbbKey}`;
 
-    const { createUser, updateUserProfile, logoutUser } = useAuth();
+    const { createUser, updateUserProfile, logoutUser, googleSignIn } = useAuth();
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
@@ -37,7 +37,7 @@ const Register = () => {
         }
         const imagefile = { image: form.profilepicture.files[0] };
         setLoading(true);
-        const res = await axiosPublic.post(imgbbAPI, imagefile, {
+        const res = await axiosPrivate.post(imgbbAPI, imagefile, {
             headers: {
                 "content-type": "multipart/form-data"
             }
@@ -49,7 +49,7 @@ const Register = () => {
                     updateUserProfile(name, profilepicture)
                         .then(() => {
                             const userData = { name, email, profilepicture, userStatus: "user", registeredIn: new Date() }
-                            axiosPublic.post("/addUser", userData)
+                            axiosPrivate.post("/addUser", userData)
                                 .then(res => {
                                     if (res.data.insertedId) {
                                         Swal.fire({
@@ -92,6 +92,22 @@ const Register = () => {
         }
     }
 
+    const handleGoogleAccount = () => {
+        googleSignIn()
+            .then(r => {
+                const userData = { name: r.user.displayName, email: r.user.email, profilePicture: r.user.photoURL, userStatus: "user", registeredIn: new Date() };
+                axiosPrivate.post("/addUser", userData)
+                    .then(res => {
+                        if (res.data.insertedId || res.data.message === "user already exists") {
+                            navigate("/");
+                        }
+                    })
+            })
+            .catch(error => {
+                console.log(error);
+            })
+    }
+
     return (
         <div className="max-w-4xl mx-auto flex justify-center mt-6 h-[700px]">
             <Helmet>
@@ -123,7 +139,7 @@ const Register = () => {
                     <div className="divider">OR</div>
                 </form>
                 <div className="flex justify-center mt-4">
-                    <button className="w-5/6 btn border-2 border-[#2a55e5] rounded-none"><FcGoogle className="text-2xl"></FcGoogle>GOOGLE</button>
+                    <button onClick={handleGoogleAccount} className="w-5/6 btn border-2 border-[#2a55e5] rounded-none"><FcGoogle className="text-2xl"></FcGoogle>GOOGLE</button>
                 </div>
                 <h3 className="text-center mt-10 absolute bottom-10 left-1/2 -translate-x-1/2">Already have an account? <Link to={"/login"}><span className="font-bold text-[#2a55e5]">Login</span></Link></h3>
             </div>

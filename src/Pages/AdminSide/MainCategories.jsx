@@ -4,10 +4,16 @@ import Swal from "sweetalert2";
 import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import { FaRegEdit } from "react-icons/fa";
+import { DataGrid } from '@mui/x-data-grid';
+import { RiDeleteBin3Fill } from "react-icons/ri";
+import { useState } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const MainCategories = () => {
 
     const axiosPrivate = useAxiosPrivate();
+    const [mcv, setMcv] = useState(null);
 
     const { data: allMainCategories, refetch } = useQuery({
         queryKey: ["allMainCategories"],
@@ -16,6 +22,54 @@ const MainCategories = () => {
             return res.data;
         }
     });
+
+    const columns = [
+        { field: 'maincategory', headerName: 'Name', flex: 1 },
+        {
+            field: 'maincategoryaddedDate',
+            headerName: 'Created on',
+            flex: 1,
+        },
+        {
+            field: 'update',
+            headerName: 'Update',
+            flex: 1,
+            renderCell: (params) => (
+                <button onClick={() => {
+                    const value = allMainCategories?.filter(fmc => fmc._id === params.row.id);
+                    setMcv(...value)
+                    document.getElementById('my_modal_show').showModal()
+                }}>
+                    <FaRegEdit className="text-xl text-green-600" />
+                </button>
+            ),
+        },
+        {
+            field: 'delete',
+            headerName: 'Delete',
+            flex: 1,
+            renderCell: (params) => (
+                <button onClick={() => {
+                    const value = allMainCategories?.filter(fmc => fmc._id === params.row.id);
+                    console.log(value[0].maincategory);
+                    axiosPrivate.delete(`/deletemaincategory/${value[0].maincategory}`)
+                        .then((res) => {
+                            console.log(res.data);
+                            refetch();
+                        })
+                    console.log(params.row.id)
+                }}>
+                    <RiDeleteBin3Fill className="text-xl text-red-600" />
+                </button>
+            ),
+        },
+    ];
+
+    const rows = allMainCategories?.map((category) => ({
+        id: category._id,
+        maincategory: category.maincategory,
+        maincategoryaddedDate: moment(category.maincategoryaddedDate).format('MMMM Do YYYY, h:mm:ss a'),
+    }));
 
     const handleAddMainCategory = (event) => {
         event.preventDefault();
@@ -49,8 +103,25 @@ const MainCategories = () => {
             })
     }
 
+    const handleUpdate = (event) => {
+        event.preventDefault();
+        axiosPrivate.put(`/updatemaincategory/${mcv.maincategory}`, { maincategory: event.target.maincategory.value })
+            .then(res => {
+                if (res.data.modifiedCount > 0) {
+                    toast("Maincategory updated", { position: toast.POSITION.TOP_CENTER });
+                    refetch();
+                }
+                if (res.data.message === "already exists") {
+                    toast("Already exist", { position: toast.POSITION.TOP_CENTER });
+                    event.target.reset();
+                    refetch();
+                }
+            })
+    }
+
     return (
         <div className="">
+            <ToastContainer></ToastContainer>
             <h2 className="font-bold text-2xl mb-5">Main Categories</h2>
             <div className="flex flex-col xl:flex-row gap-5">
                 <div className="w-full xl:w-1/3 shadow-lg p-6 bg-white rounded-lg h-fit">
@@ -62,31 +133,38 @@ const MainCategories = () => {
                 </div>
                 <div className="w-full shadow-lg p-6 bg-white rounded-lg h-fit">
                     <p className="mb-5 font-semibold">All Main Categories</p>
-                    <div className="overflow-x-auto">
-                        <table className="table">
-                            {/* head */}
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Date</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    allMainCategories?.map(category => {
-                                        return <tr key={category?._id}>
-                                            <td>{category?.maincategory}</td>
-                                            <td>{moment(category?.maincategoryaddedDate).format("MMM Do YY")}</td>
-                                            <td><button><FaRegEdit className="text-xl"></FaRegEdit></button></td>
-                                        </tr>
-                                    })
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                    {
+                        allMainCategories && allMainCategories.length > 0 ?
+                            <div style={{ height: 400, width: '100%' }}>
+                                <DataGrid
+                                    rows={rows}
+                                    columns={columns}
+                                    pageSize={5}
+                                />
+                            </div> : ""
+                    }
                 </div>
             </div>
+            {/* Modal */}
+            <dialog
+                id="my_modal_show"
+                className="modal"
+            >
+                <div className="modal-box">
+                    <form onSubmit={handleUpdate}>
+                        <label className="form-control w-full">
+                            <div className="label">
+                                <span className="label-text">Main Category name</span>
+                            </div>
+                            <input name="maincategory" defaultValue={mcv?.maincategory} type="text" placeholder="Type here" className="input input-bordered w-full focus:outline-none" />
+                        </label>
+                        <input className="btn mt-3 bg-orange-500 text-white" type="submit" value="Update" />
+                    </form>
+                </div>
+                <form method="dialog" className="modal-backdrop">
+                    <button></button>
+                </form>
+            </dialog>
         </div>
     );
 };

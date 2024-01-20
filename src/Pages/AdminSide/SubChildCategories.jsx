@@ -6,10 +6,13 @@ import { ToastContainer, toast } from "react-toastify";
 import useAxiosPrivate from "../../Hooks/useAxiosPrivate";
 import { useState } from "react";
 import Swal from "sweetalert2";
+import { RiDeleteBin3Fill } from "react-icons/ri";
+import { DataGrid } from '@mui/x-data-grid';
 
 const SubChildCategories = () => {
 
     const axiosPrivate = useAxiosPrivate();
+    const [mcv, setMcv] = useState(null);
 
     const { data: allMainCategories } = useQuery({
         queryKey: ["allMainCategories"],
@@ -35,6 +38,58 @@ const SubChildCategories = () => {
                 setSubCategories(res.data);
             })
     }
+
+    const columns = [
+        { field: 'maincategory', headerName: 'Main Category', flex: 1 },
+        { field: 'subcategory', headerName: 'Sub Category', flex: 1 },
+        { field: 'subchildcategory', headerName: 'Sub Child Category', flex: 1 },
+        {
+            field: 'subchildcategoryaddedDate',
+            headerName: 'Created on',
+            flex: 1,
+        },
+        {
+            field: 'update',
+            headerName: 'Update',
+            flex: 1,
+            renderCell: (params) => (
+                <button onClick={() => {
+                    const value = allSubChildCategories?.filter(fmc => fmc._id === params.row.id);
+                    setMcv(...value)
+                    document.getElementById('my_modal_show').showModal()
+                }}>
+                    <FaRegEdit className="text-xl text-green-600" />
+                </button>
+            ),
+        },
+        {
+            field: 'delete',
+            headerName: 'Delete',
+            flex: 1,
+            renderCell: (params) => (
+                <button onClick={() => {
+                    const value = allSubChildCategories?.filter(fmc => fmc._id === params.row.id);
+                    console.log(value[0].subchildcategory);
+                    axiosPrivate.delete(`/deletesubchildcategory/${value[0].subchildcategory}`)
+                        .then((res) => {
+                            console.log(res.data);
+                            refetch();
+                        })
+                    console.log(params.row.id)
+                }}>
+                    <RiDeleteBin3Fill className="text-xl text-red-600" />
+                </button>
+            ),
+        },
+    ];
+
+    const rows = allSubChildCategories?.map((category) => ({
+        id: category._id,
+        maincategory: category.maincategory,
+        subcategory: category.subcategory,
+        subchildcategory: category.subchildcategory,
+        subchildcategoryaddedDate: moment(category.subchildcategoryaddedDate).format('MMMM Do YYYY, h:mm:ss a'),
+    }));
 
     const handleAddSubChildCategory = (event) => {
         event.preventDefault();
@@ -76,6 +131,22 @@ const SubChildCategories = () => {
             })
     }
 
+    const handleUpdate = (event) => {
+        event.preventDefault();
+        axiosPrivate.put(`/updatesubchildcategory/${mcv.subchildcategory}`, { subchildcategory: event.target.subchildcategory.value })
+            .then(res => {
+                if (res.data.modifiedCount > 0) {
+                    toast("Subchild category updated", { position: toast.POSITION.TOP_CENTER });
+                    refetch();
+                }
+                if (res.data.message === "already exists") {
+                    toast("Already exist", { position: toast.POSITION.TOP_CENTER });
+                    event.target.reset();
+                    refetch();
+                }
+            })
+    }
+
     return (
         <div className="">
             <ToastContainer></ToastContainer>
@@ -102,9 +173,18 @@ const SubChildCategories = () => {
                 </div>
                 <div className="w-full shadow-lg p-6 bg-white rounded-lg h-fit">
                     <p className="mb-5 font-semibold">All Sub Child Categories</p>
-                    <div className="overflow-x-auto">
+                    {
+                        allSubChildCategories && allSubChildCategories.length > 0 ?
+                            <div style={{ height: 400, width: '100%' }}>
+                                <DataGrid
+                                    rows={rows}
+                                    columns={columns}
+                                    pageSize={5}
+                                />
+                            </div> : ""
+                    }
+                    {/* <div className="overflow-x-auto">
                         <table className="table">
-                            {/* head */}
                             <thead>
                                 <tr>
                                     <th>Main Category</th>
@@ -128,9 +208,29 @@ const SubChildCategories = () => {
                                 }
                             </tbody>
                         </table>
-                    </div>
+                    </div> */}
                 </div>
             </div>
+            {/* Modal */}
+            <dialog
+                id="my_modal_show"
+                className="modal"
+            >
+                <div className="modal-box">
+                    <form onSubmit={handleUpdate}>
+                        <label className="form-control w-full">
+                            <div className="label">
+                                <span className="label-text">Subchild Category name</span>
+                            </div>
+                            <input name="subchildcategory" defaultValue={mcv?.subchildcategory} type="text" placeholder="Type here" className="input input-bordered w-full focus:outline-none" />
+                        </label>
+                        <input className="btn mt-3 bg-orange-500 text-white" type="submit" value="Update" />
+                    </form>
+                </div>
+                <form method="dialog" className="modal-backdrop">
+                    <button></button>
+                </form>
+            </dialog>
         </div>
     );
 };

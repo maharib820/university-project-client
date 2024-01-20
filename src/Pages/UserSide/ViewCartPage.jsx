@@ -78,7 +78,7 @@ const ViewCartPage = () => {
             .reduce((acc, currentValue) => acc + currentValue, 0);
         setPaymentAmount(totalAmount);
         if (totalAmount > 0) {
-            setLastTotal(totalAmount - 50);
+            setLastTotal(totalAmount + 50);
         }
     }, [cartItems])
 

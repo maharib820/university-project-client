@@ -1,11 +1,35 @@
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../../Hooks/useAuth';
+import useAxiosPublic from '../../Hooks/useAxiosPublic';
 
 const ShowProducts = ({ product }) => {
+
+    const navigate = useNavigate();
+
+    const { user } = useAuth();
+    const axiosPublic = useAxiosPublic();
+
+    const handleBtnClick = () => {
+        const visitData = {
+            email: user?.email,
+            productId: product._id,
+            viewedDate: new Date()
+        };
+        axiosPublic.post("/recentlyvisited", visitData)
+            .then(res => {
+                console.log(res.data);
+            })
+        navigate(`/productdetails/${product._id}`);
+    }
+
     return (
-        <Link to={`/productdetails/${product._id}`}>
-            <div className="bg-white p-5 space-y-3 rounded-lg">
-                <img src={product.productpictures[0]} alt="" />
+        // <Link to={`/productdetails/${product._id}`}>
+        <button onClick={handleBtnClick}>
+            <div className="bg-white p-5 space-y-3 rounded-lg flex flex-col h-full">
+                <div className='flex h-full'>
+                    <img style={{ maxHeight: '250px' }} className='flex-grow object-cover' src={product.productpictures[0]} alt="" />
+                </div>
                 <p className="text-[#0066cc]">{product.productname}</p>
                 <p>Brand: {product.productbrand}</p>
                 <div>
@@ -22,7 +46,8 @@ const ShowProducts = ({ product }) => {
                     }
                 </div>
             </div>
-        </Link>
+        </button>
+        // </Link>
     );
 };
 

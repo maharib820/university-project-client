@@ -1,11 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import useAxiosPrivate from "../../Hooks/useAxiosPrivate";
+import { FaUsers } from "react-icons/fa";
+import { MdOutlineProductionQuantityLimits } from "react-icons/md";
+import { RiShoppingCartFill } from "react-icons/ri";
+import { BarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell } from 'recharts';
 
 const AdminDashboard = () => {
 
     const axiosPrivate = useAxiosPrivate();
 
-    const {data: stats} =useQuery({
+    const { data: stats } = useQuery({
         queryKey: ["stats"],
         queryFn: async () => {
             const res = await axiosPrivate.get("/stats");
@@ -13,46 +18,150 @@ const AdminDashboard = () => {
         }
     });
 
+    const { data: statschart } = useQuery({
+        queryKey: ["statschart"],
+        queryFn: async () => {
+            const res = await axiosPrivate.get("/maincatwish");
+            return res.data;
+        }
+    });
+
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#0088FE', '#00C49F', '#FFBB28', '#FF8042']
+
+    const RADIAN = Math.PI / 180;
+    const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+        const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+        const x = cx + radius * Math.cos(-midAngle * RADIAN);
+        const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+        return (
+            <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+                {`${(percent * 100).toFixed(0)}%`}
+            </text>
+        );
+    };
+
+    const pieChartData = statschart?.map(data => {
+        return {
+            name: data.ainCategory,
+            value: data.totalRevenue
+        }
+    })
+
     return (
-        <div className="max-w-7xl mx-auto">
-            <div className="stats shadow">
-
-                <div className="stat">
-                    <div className="stat-figure text-secondary">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <div className="p-5">
+            <div className="flex gap-10">
+                <div className="flex-1 bg-white border shadow h-32 p-5 flex items-center gap-10">
+                    <div className="bg-green-200 rounded-full">
+                        <div>
+                            <FaUsers className="text-green-600 m-3"></FaUsers>
+                        </div>
                     </div>
-                    <div className="stat-title">Users</div>
-                    <div className="stat-value">{stats?.users}</div>
+                    <div>
+                        <div className="stat-title">Users</div>
+                        <div className="stat-value">{stats?.users}</div>
+                    </div>
                 </div>
-
-                <div className="stat">
-                    <div className="stat-figure text-secondary">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                <div className="flex-1 bg-white border shadow h-32 p-5 flex items-center gap-10">
+                    <div className="bg-orange-200 rounded-full">
+                        <div>
+                            <MdOutlineProductionQuantityLimits className="text-orange-600 m-3"></MdOutlineProductionQuantityLimits>
+                        </div>
                     </div>
-                    <div className="stat-title">New Users</div>
-                    <div className="stat-value">4,200</div>
-                    <div className="stat-desc">↗︎ 400 (22%)</div>
+                    <div>
+                        <div className="stat-title">Total Products</div>
+                        <div className="stat-value">{stats?.products}</div>
+                    </div>
                 </div>
-
-                <div className="stat">
-                    <div className="stat-figure text-secondary">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                <div className="flex-1 bg-white border shadow h-32 p-5 flex items-center gap-10">
+                    <div className="bg-red-200 rounded-full">
+                        <div>
+                            <RiShoppingCartFill className="text-red-600 m-3"></RiShoppingCartFill>
+                        </div>
                     </div>
-                    <div className="stat-title">New Users</div>
-                    <div className="stat-value">4,200</div>
-                    <div className="stat-desc">↗︎ 400 (22%)</div>
+                    <div>
+                        <div className="stat-title">Total Orders</div>
+                        <div className="stat-value">{stats?.orders}</div>
+                    </div>
                 </div>
-
-                <div className="stat">
-                    <div className="stat-figure text-secondary">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                <div className="flex-1 bg-white border shadow h-32 p-5 flex items-center gap-10">
+                    <div className="bg-blue-200 rounded-full">
+                        <div>
+                            <FaUsers className="text-blue-600 m-3"></FaUsers>
+                        </div>
                     </div>
-                    <div className="stat-title">New Registers</div>
-                    <div className="stat-value">1,200</div>
-                    <div className="stat-desc">↘︎ 90 (14%)</div>
+                    <div>
+                        <div className="stat-title">Revenue</div>
+                        <div className="stat-value">{stats?.revenue}</div>
+                    </div>
                 </div>
 
             </div>
+            {
+                statschart ? <div className="w-full mt-28">
+                    <div className="flex">
+                        <div className="w-full flex-grow">
+                            <BarChart
+                                width={500}
+                                height={300}
+                                data={statschart}
+                                margin={{
+                                    top: 5,
+                                    right: 30,
+                                    left: 20,
+                                    bottom: 5,
+                                }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="mainCategory" />
+                                <YAxis />
+                                <Tooltip />
+                                <Legend />
+                                <Bar dataKey="totalRevenue" fill="#8884d8" activeBar={<Rectangle fill="pink" stroke="blue" />} />
+                            </BarChart>
+                        </div>
+                        <div className="w-full flex-grow">
+                            <BarChart
+                                width={500}
+                                height={300}
+                                data={statschart}
+                                margin={{
+                                    top: 5,
+                                    right: 30,
+                                    left: 20,
+                                    bottom: 5,
+                                }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="mainCategory" />
+                                <YAxis />
+                                <Tooltip />
+                                <Legend />
+                                <Bar dataKey="totalSold" fill="#8884d8" activeBar={<Rectangle fill="pink" stroke="blue" />} />
+                            </BarChart>
+                        </div>
+                        <div className="w-full flex-grow">
+                            <PieChart width={400} height={242}>
+                                <Pie
+                                    data={pieChartData}
+                                    cx="50%"
+                                    cy="50%"
+                                    labelLine={false}
+                                    label={renderCustomizedLabel}
+                                    outerRadius={80}
+                                    fill="#8884d8"
+                                    dataKey="value"
+                                >
+                                    {pieChartData?.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                            </PieChart>
+                            <p className="text-center w-[400px]">Revenue percentage of Main Categories</p>
+                        </div>
+                    </div>
+                </div> : ""
+            }
         </div>
     );
 };

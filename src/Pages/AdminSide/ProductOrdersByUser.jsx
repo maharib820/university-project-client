@@ -2,6 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { MdEdit } from "react-icons/md";
 import useAxiosPrivate from "../../Hooks/useAxiosPrivate";
 import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
+import moment from "moment";
+import { DataGrid } from '@mui/x-data-grid';
 
 const ProductOrdersByUser = () => {
 
@@ -10,7 +13,7 @@ const ProductOrdersByUser = () => {
     const { data: orderProduct, refetch } = useQuery({
         queryKey: ["orderProduct"],
         queryFn: async () => {
-            const res = await axiosPrivate("/orderProductByUser");
+            const res = await axiosPrivate("/vieworderhistoryadmin");
             return res.data;
         }
     });
@@ -45,146 +48,232 @@ const ProductOrdersByUser = () => {
         });
     }
 
+    const columns = [
+        { field: 'index', headerName: '#', flex: 1 },
+        { field: 'time', headerName: 'Date', flex: 2, valueGetter: (params) => moment(params.row.time).format('MMMM Do YYYY, h:mm:ss a') },
+        { field: 'transactionId', headerName: 'Transaction ID', flex: 2 },
+        { field: 'email', headerName: 'User Email', flex: 2 },
+        {
+            field: 'products',
+            headerName: 'Products',
+            flex: 2,
+            renderCell: (params) => (
+                <div>
+                    <Link to={`/orderfullinfo/${params.row.id}`}>
+                        <button><div className="badge badge-primary badge-outline">details</div></button>
+                    </Link>
+                </div>
+            ),
+        },
+        { field: 'amountpaid', headerName: 'Total Price', flex: 2, valueGetter: (params) => params.row.amountpaid},
+        {
+            field: 'userAddress',
+            headerName: 'User Address',
+            flex: 2,
+            renderCell: (params) => (
+                <div>
+                    <button onClick={() => {
+                        console.log(params);
+                        document.getElementById('my_modal_address').showModal()
+                    }}>
+                        <div className="badge badge-secondary badge-outline">view</div>
+                    </button>
+                    <dialog id="my_modal_address" className="modal">
+                        <div className="modal-box">
+                            <h3 className="font-bold text-center">Address</h3>
+                            <div className="overflow-x-auto">
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Country</th>
+                                            <th>District</th>
+                                            <th>Phone No</th>
+                                            <th>Town</th>
+                                            <th>Street Address</th>
+                                            <th>Postcode</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{params.row.userAddress[0].country}</td>
+                                            <td>{params.row.userAddress[0].district}</td>
+                                            <td>{params.row.userAddress[0].phone}</td>
+                                            <td>{params.row.userAddress[0].town}</td>
+                                            <td>{params.row.userAddress[0].streetaddress}</td>
+                                            <td>{params.row.userAddress[0].postcode}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <form method="dialog" className="modal-backdrop">
+                            <button>close</button>
+                        </form>
+                    </dialog>
+                </div>
+            ),
+        },
+        { field: 'status', headerName: 'Product Status', flex: 2 },
+        {
+            field: 'actions',
+            headerName: 'Actions',
+            flex: 2,
+            renderCell: (params) => {
+                // console.log(params);
+                const { id, status } = params.row;
+                return (
+                    <>
+                        {
+                            status === "pending" ?
+                                <button onClick={() => handleStatus(id, "approved")} className="bg-orange-600 text-white flex items-center px-2 rounded-full">
+                                    <MdEdit />
+                                    Approve
+                                </button>
+                                :
+                                status === "approved" ?
+                                    <button onClick={() => handleStatus(id, "completed")} className="bg-green-600 text-white flex items-center px-2 rounded-full">
+                                        <MdEdit />
+                                        Confirm
+                                    </button>
+                                    :
+                                    <div className="badge badge-accent bg-red-600 text-white">delivered</div>
+                        }
+                    </>
+                );
+            },
+        },
+    ];
+
+    const rows = orderProduct?.map((order, index) => ({
+        id: order._id,
+        index: index + 1,
+        time: order.time,
+        transactionId: order.transactionId,
+        email: order.email,
+        products: order.products,
+        amountpaid: order.amountpaid,
+        userAddress: order.userdetails,
+        status: order.status,
+    }));
+
     return (
         <div>
             <h2 className="font-bold text-2xl mb-5">Orders</h2>
             <div className="shadow-lg p-6 bg-white rounded-lg">
                 <p className="mb-5 font-semibold pb-4 border-b">Orders List</p>
-                <div className="overflow-x-auto">
-                    <table className="table">
-                        {/* head */}
-                        <thead>
-                            <tr>
-                                <th>User Email</th>
-                                <th>Products</th>
-                                <th>Total Price</th>
-                                <th>User Address</th>
-                                <th>Product Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                orderProduct?.map((order, index) => {
-                                    return <tr key={index}>
-                                        <td>{order.email}</td>
-                                        <td>
-                                            <div>
-                                                <button onClick={() => document.getElementById('my_modal2').showModal()}><div className="badge badge-primary badge-outline">details</div></button>
-                                                <dialog id="my_modal2" className="modal">
-                                                    <div className="modal-box">
-                                                        <div className="overflow-x-auto">
-                                                            <table className="table">
-                                                                {/* head */}
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th></th>
-                                                                        <th>Name</th>
-                                                                        <th>Image</th>
-                                                                        <th>Quantity</th>
-                                                                        <th>Brand</th>
-                                                                        <th>Unit</th>
-                                                                        <th>Net Price</th>
-                                                                        <th>Total Price</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    {
-                                                                        order.cartId.map((dt, index) => {
-                                                                            return <tr key={index}>
-                                                                                <th>{index + 1}</th>
-                                                                                <td>{dt.cartItemsList.productname}</td>
-                                                                                <td><img className="w-12" src={dt.cartItemsList.productpictures[0]} alt="" /></td>
-                                                                                <td>{dt.totalSelectedItems}</td>
-                                                                                <td>{dt.cartItemsList.productbrand}</td>
-                                                                                <td>{dt.cartItemsList.measurment} {dt.cartItemsList.productunit}</td>
-                                                                                <td>{dt.cartItemsList.productfinalprice}</td>
-                                                                                <td>{dt.cartItemsList.productfinalprice * dt.totalSelectedItems}</td>
-                                                                            </tr>
-                                                                        })
-                                                                    }
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <form method="dialog" className="modal-backdrop">
-                                                        <button>close</button>
-                                                    </form>
-                                                </dialog>
-                                            </div>
-                                        </td>
-                                        <td>{order.amountpaid}</td>
-                                        <td>
-                                            <div>
-                                                <button onClick={() => document.getElementById('my_mod2').showModal()}><div className="badge badge-accent badge-outline">detailed address</div></button>
-                                                <dialog id="my_mod2" className="modal">
-                                                    <div className="modal-box">
-                                                        <div>
-                                                            <div className="overflow-x-auto">
-                                                                <table className="table">
-                                                                    {/* head */}
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>Name</th>
-                                                                            <th>Image</th>
-                                                                            <th>Phone</th>
-                                                                            <th>Country</th>
-                                                                            <th>District</th>
-                                                                            <th>Town / City</th>
-                                                                            <th>Street Address</th>
-                                                                            <th>Zip Code</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {/* row 1 */}
-                                                                        <tr>
-                                                                            <td>{order.userDetails.name}</td>
-                                                                            <td><img className="w-14 rounded-full" src={order.userDetails.profilepicture} alt="" /></td>
-                                                                            <td>{order.userDetails.phone}</td>
-                                                                            <td>{order.userDetails.country}</td>
-                                                                            <td>{order.userDetails.district}</td>
-                                                                            <td>{order.userDetails.town}</td>
-                                                                            <td>{order.userDetails.streetaddress}</td>
-                                                                            <td>{order.userDetails.postcode}</td>
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <form method="dialog" className="modal-backdrop">
-                                                        <button>close</button>
-                                                    </form>
-                                                </dialog>
-                                            </div>
-                                        </td>
-                                        <td>{order.status}</td>
-                                        <td>
-                                            {
-                                                order.status === "pending"
-                                                    ?
-                                                    <button onClick={() => handleStatus(order._id, "approved")} className="btn bg-orange-600 text-white">
-                                                        <MdEdit></MdEdit>
-                                                        Approve
-                                                    </button>
-                                                    :
-                                                    order.status === "approved" ?
-                                                        <button onClick={() => handleStatus(order._id, "completed")} className="btn bg-green-600 text-white">
-                                                            <MdEdit></MdEdit>
-                                                            Confirm
-                                                        </button>
-                                                        :
-                                                        <div className="badge badge-accent bg-green-600 text-white">delivered</div>
-                                            }
-                                        </td>
-                                    </tr>
-                                })
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                {
+                    orderProduct && orderProduct.length > 0 ?
+                        <div style={{ height: 400, width: '100%' }}>
+                            <DataGrid
+                                rows={rows}
+                                columns={columns}
+                                pageSize={5}
+                            />
+                        </div>
+                        : <p>No orders found</p>
+                }
             </div>
         </div>
+        // <div>
+        //     <h2 className="font-bold text-2xl mb-5">Orders</h2>
+        //     <div className="shadow-lg p-6 bg-white rounded-lg">
+        //         <p className="mb-5 font-semibold pb-4 border-b">Orders List</p>
+        //         <div className="overflow-x-auto">
+        //             <table className="table">
+        //                 {/* head */}
+        //                 <thead>
+        //                     <tr>
+        //                         <th></th>
+        //                         <th>Date</th>
+        //                         <th>Transaction ID</th>
+        //                         <th>User Email</th>
+        //                         <th>Products</th>
+        //                         <th>Total Price</th>
+        //                         <th>User Address</th>
+        //                         <th>Product Status</th>
+        //                         <th>Actions</th>
+        //                     </tr>
+        //                 </thead>
+        //                 <tbody>
+        //                     {
+        //                         orderProduct?.map((order, index) => {
+        //                             return <tr key={index}>
+        //                                 <td>{index + 1}</td>
+        //                                 <td>{moment(order?.time).format('MMMM Do YYYY, h:mm:ss a')}</td>
+        //                                 <td>{order.transactionId}</td>
+        //                                 <td>{order.email}</td>
+        //                                 <td>
+        //                                     <div>
+        //                                         <Link to={`/orderfullinfo/${order?._id}`}><button><div className="badge badge-primary badge-outline">details</div></button></Link>
+        //                                     </div>
+        //                                 </td>
+        //                                 <td>{order.amountpaid} Taka</td>
+        //                                 <td>
+        //                                     <div>
+        //                                         <button onClick={() => document.getElementById('my_modal_address').showModal()}><div className="badge badge-secondary badge-outline">view</div></button>
+        //                                         <dialog id="my_modal_address" className="modal">
+        //                                             <div className="modal-box">
+        //                                                 <h3 className="font-bold text-center">Address</h3>
+        //                                                 <div className="overflow-x-auto">
+        //                                                     <table className="table">
+        //                                                         {/* head */}
+        //                                                         <thead>
+        //                                                             <tr>
+        //                                                                 <th>Country</th>
+        //                                                                 <th>District</th>
+        //                                                                 <th>Phone No</th>
+        //                                                                 <th>Town</th>
+        //                                                                 <th>Street Address</th>
+        //                                                                 <th>Postcode</th>
+        //                                                             </tr>
+        //                                                         </thead>
+        //                                                         <tbody>
+        //                                                             {/* row 1 */}
+        //                                                             <tr>
+        //                                                                 <td>{order.userdetails[0].country}</td>
+        //                                                                 <td>{order.userdetails[0].district}</td>
+        //                                                                 <td>{order.userdetails[0].phone}</td>
+        //                                                                 <td>{order.userdetails[0].town}</td>
+        //                                                                 <td>{order.userdetails[0].streetaddress}</td>
+        //                                                                 <td>{order.userdetails[0].postcode}</td>
+        //                                                             </tr>
+        //                                                         </tbody>
+        //                                                     </table>
+        //                                                 </div>
+        //                                             </div>
+        //                                             <form method="dialog" className="modal-backdrop">
+        //                                                 <button>close</button>
+        //                                             </form>
+        //                                         </dialog>
+        //                                     </div>
+        //                                 </td>
+        //                                 <td>{order.status}</td>
+        //                                 <td>
+        //                                     {
+        //                                         order.status === "pending"
+        //                                             ?
+        //                                             <button onClick={() => handleStatus(order._id, "approved")} className="btn bg-orange-600 text-white">
+        //                                                 <MdEdit></MdEdit>
+        //                                                 Approve
+        //                                             </button>
+        //                                             :
+        //                                             order.status === "approved" ?
+        //                                                 <button onClick={() => handleStatus(order._id, "completed")} className="btn bg-green-600 text-white">
+        //                                                     <MdEdit></MdEdit>
+        //                                                     Confirm
+        //                                                 </button>
+        //                                                 :
+        //                                                 <div className="badge badge-accent bg-green-600 text-white">delivered</div>
+        //                                     }
+        //                                 </td>
+        //                             </tr>
+        //                         })
+        //                     }
+        //                 </tbody>
+        //             </table>
+        //         </div>
+        //     </div>
+        // </div>
     );
 };
 

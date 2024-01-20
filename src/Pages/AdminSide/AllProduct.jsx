@@ -3,15 +3,19 @@ import useAxiosPrivate from "../../Hooks/useAxiosPrivate";
 import { FiEdit } from "react-icons/fi";
 import { MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const AllProduct = () => {
 
     const axiosPrivate = useAxiosPrivate();
 
+    const [productsData, setProductsData] = useState(null);
+
     const { data: allproductsdata } = useQuery({
         queryKey: ["allproductsdata"],
         queryFn: async () => {
             const res = await axiosPrivate("/getallproducts");
+            setProductsData(res.data);
             return res.data;
         }
     })
@@ -22,16 +26,31 @@ const AllProduct = () => {
         navigate(`/dashboard/updatesingleproductdetails/${id}`)
     }
 
+    const handleSearch = (e) => {
+        if (!e.target.value) {
+            setProductsData(allproductsdata);
+        }
+        else {
+            axiosPrivate(`/allCustomSearch/${e.target.value}`)
+                .then(res => {
+                    setProductsData(res.data);
+                })
+        }
+    }
+
     return (
         <div>
             <h2 className="font-bold text-2xl mb-5">Products</h2>
             <div className="shadow-lg p-6 bg-white rounded-lg">
                 <p className="mb-5 font-semibold pb-4 border-b">Products List</p>
+                <div className='mt-5 mb-8'>
+                    <input onChange={handleSearch} className='border h-12 px-5 w-full lg:w-1/3 xl:1/5 focus:outline-none border-black' type="text" name="search" placeholder='Search here' />
+                </div>
                 <div className="overflow-x-auto">
                     <table className="table">
                         {/* head */}
                         <thead>
-                            <tr>
+                            <tr className="border-b border-b-black">
                                 <th>No</th>
                                 <th>Image</th>
                                 <th>Product Name</th>
@@ -50,8 +69,8 @@ const AllProduct = () => {
                         </thead>
                         <tbody>
                             {
-                                allproductsdata?.map((product, index) => {
-                                    return <tr key={product?._id}>
+                                productsData?.map((product, index) => {
+                                    return <tr key={product?._id} className="border-b border-b-black">
                                         <td>{index + 1}</td>
                                         <td>
                                             <div className="flex items-center gap-3">

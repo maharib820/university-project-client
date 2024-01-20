@@ -144,7 +144,7 @@ const AddNewProduct = () => {
                 return;
             }
         }
-        const data = { maincategory, subcategory, subchildcategory, productname, productbrand, productinfo, productpictures, measurment, productunit, productstatus, sellprice, quantity, productdiscount, producttotalprice, productdiscountprice, productfinalprice, productdescription, productaddeddate: new Date() };
+        const data = { maincategory, subcategory, subchildcategory, productname, productbrand, productinfo, productpictures, measurment, productunit, productstatus, sellprice, quantity, productdiscount, producttotalprice, productdiscountprice, productfinalprice, productdescription, productaddeddate: new Date(), totalSold: 0 };
         axiosPrivate.post("/addnewproduct", data)
             .then(res => {
                 if (res.data.insertedId) {
@@ -189,19 +189,19 @@ const AddNewProduct = () => {
                 <p className="mb-5 font-semibold pb-4 border-b">Add New Product</p>
                 <form onSubmit={handleAddNewProduct} className="space-y-5">
                     <div className="flex flex-col lg:flex-row gap-5">
-                        <select style={{ height: '55px' }} onChange={handleMainCategorySelect} defaultValue={"Select Main Category"} name="maincategory" className="select select-bordered w-full rounded" required>
+                        <select style={{ height: '55px' }} onChange={handleMainCategorySelect} defaultValue={"Select Main Category"} name="maincategory" className="select select-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required>
                             <option disabled>Select Main Category</option>
                             {
                                 allMainCategories?.map(category => <option key={category._id}>{category.maincategory}</option>)
                             }
                         </select>
-                        <select style={{ height: '55px' }} onChange={handleSubCategorySelect} defaultValue={"Select Sub Category"} name="subcategory" className="select select-bordered w-full rounded" required>
+                        <select style={{ height: '55px' }} onChange={handleSubCategorySelect} defaultValue={"Select Sub Category"} name="subcategory" className="select select-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required>
                             <option disabled>Select Sub Category</option>
                             {
                                 subCategories?.map(category => <option key={category._id}>{category.subcategory}</option>)
                             }
                         </select>
-                        <select style={{ height: '55px' }} defaultValue={"Select Sub Child Category"} name="subchildcategory" className="select select-bordered w-full rounded" required>
+                        <select style={{ height: '55px' }} defaultValue={"Select Sub Child Category"} name="subchildcategory" className="select select-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required>
                             <option disabled>Select Sub Child Category</option>
                             {
                                 subChildCategories?.map(category => <option key={category._id}>{category.subchildcategory}</option>)
@@ -212,11 +212,11 @@ const AddNewProduct = () => {
                         <TextField name="productname" label="Product Name" variant="outlined" fullWidth required type="text" />
                         <TextField name="productbrand" label="Product Brand" variant="outlined" fullWidth required type="text" />
                     </div>
-                    <textarea name="productinfo" className="textarea textarea-bordered w-full rounded-md" cols="30" rows="3" placeholder="Product Information"></textarea>
+                    <textarea name="productinfo" className="textarea textarea-bordered w-full rounded-md focus:outline-none focus:border-[#1976d2] focus:border-2" cols="30" rows="3" placeholder="Product Information"></textarea>
                     <input name="productimage" type="file" accept="image/*" className="file-input file-input-bordered w-full rounded focus:border-none" multiple required />
                     <div className="flex flex-col lg:flex-row gap-5">
                         <TextField name="measurment" label="Measurment" variant="outlined" fullWidth required type="number" InputProps={{ inputProps: { min: 1 } }} />
-                        <select style={{ height: '55px' }} defaultValue={"Select Unit"} name="productunit" className="select select-bordered w-full rounded" required>
+                        <select style={{ height: '55px' }} defaultValue={"Select Unit"} name="productunit" className="select select-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required>
                             <option disabled>Select Unit</option>
                             <option>kg</option>
                             <option>gm</option>
@@ -225,7 +225,7 @@ const AddNewProduct = () => {
                             <option>pack</option>
                             <option>pc</option>
                         </select>
-                        <select style={{ height: '55px' }} defaultValue={"Select Status"} name="productstatus" className="select select-bordered w-full rounded" required>
+                        <select style={{ height: '55px' }} defaultValue={"Select Status"} name="productstatus" className="select select-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required>
                             <option disabled>Select Status</option>
                             <option>Active</option>
                             <option>Discontinued</option>
@@ -239,7 +239,7 @@ const AddNewProduct = () => {
                         <TextField value={discountPrice} name="discountprice" label="Discount Price" variant="outlined" fullWidth required type="number" InputProps={{ readOnly: true }} />
                         <TextField value={finalprice} name="finalprice" label="Final Price" variant="outlined" fullWidth required type="number" InputProps={{ readOnly: true }} />
                     </div>
-                    <textarea name="productdescription" className="textarea textarea-bordered w-full rounded-md" cols="30" rows="5" placeholder="Product Description" required></textarea>
+                    <textarea name="productdescription" className="textarea textarea-bordered w-full rounded-md focus:outline-none focus:border-[#1976d2] focus:border-2" cols="30" rows="5" placeholder="Product Description" required></textarea>
                     {
                         loading ?
                             <button className="btn h-14 bg-green-500 text-white text-lg rounded-md">

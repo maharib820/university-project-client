@@ -2,30 +2,22 @@ import useAxiosPrivate from "../../Hooks/useAxiosPrivate";
 import useAuth from "../../Hooks/useAuth";
 import { GoInfo } from "react-icons/go";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
 const UserOrderPage = () => {
 
     const axiosPrivate = useAxiosPrivate();
     const { user } = useAuth();
-    // const [orderDatas, setOrderDatas] = useState(null);
 
     const { data: orderDatas, isPending: isOrderPending } = useQuery({
         queryKey: ['orderDatas', user],
         queryFn: async () => {
-            const res = await axiosPrivate(`/myorder/${user?.email}`);
+            const res = await axiosPrivate(`/vieworderhistory/${user?.email}`);
             return res.data;
         }
     });
 
     console.log(orderDatas);
-
-    // useEffect(() => {
-    //     axiosPrivate(`/myorder/${user?.email}`)
-    //         .then(res => {
-    //             setOrderDatas(res.data);
-    //         })
-    // }, [axiosPrivate, user?.email])
-    // console.log(orderDatas);
 
     return (
         <div className="max-w-7xl mx-auto mt-10">
@@ -55,54 +47,14 @@ const UserOrderPage = () => {
                                                 <td>{order.transactionId}</td>
                                                 <td>
                                                     <div>
-                                                        <button onClick={() => document.getElementById('order_modal_2').showModal()}>
-                                                            <div className="badge badge-info gap-2">
-                                                                <GoInfo></GoInfo>
-                                                                view details
-                                                            </div>
+                                                        <button className="text-white">
+                                                            <Link to={`/orderfullinfo/${order._id}`}>
+                                                                <div className="badge badge-info gap-2 text-white">
+                                                                    <GoInfo></GoInfo>
+                                                                    view details
+                                                                </div>
+                                                            </Link>
                                                         </button>
-                                                        <dialog id="order_modal_2" className="modal">
-                                                            <div className="modal-box">
-                                                                {
-                                                                    <div className="overflow-x-auto">
-                                                                        <table className="table">
-                                                                            {/* head */}
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th></th>
-                                                                                    <th>Image</th>
-                                                                                    <th>Name</th>
-                                                                                    <th>Quantity</th>
-                                                                                    <th>Unit</th>
-                                                                                    <th>Net Price</th>
-                                                                                    <th>Total Price</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody>
-                                                                                {
-                                                                                    order?.cartId?.map((mo, index) => {
-                                                                                        return <tr key={index}>
-                                                                                            <th>{index+1}</th>
-                                                                                            <td>
-                                                                                                <img className="w-14" src={mo.cartItemsList.productpictures[0]} alt="" />
-                                                                                            </td>
-                                                                                            <td>{mo.cartItemsList.productname}</td>
-                                                                                            <td>{mo.totalSelectedItems}</td>
-                                                                                            <td>{mo.totalSelectedItems} x {mo.cartItemsList.measurment}{mo.cartItemsList.productunit}</td>
-                                                                                            <td>{mo.cartItemsList.productfinalprice}</td>
-                                                                                            <td>{mo.totalSelectedItems * mo.cartItemsList.productfinalprice}</td>
-                                                                                        </tr>
-                                                                                    })
-                                                                                }
-                                                                            </tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                }
-                                                            </div>
-                                                            <form method="dialog" className="modal-backdrop">
-                                                                <button>close</button>
-                                                            </form>
-                                                        </dialog>
                                                     </div>
                                                 </td>
                                                 <td>{order.amountpaid} tk</td>

@@ -7,7 +7,7 @@ const useRole = () => {
     const {user, loading} = useAuth();
     const axiosPublic = useAxiosPublic();
 
-    const {data: status} = useQuery({
+    const {data: status, isPending: isRolePending} = useQuery({
         queryKey: ["role"],
         enabled: !loading,
         queryFn: async () => {
@@ -16,7 +16,7 @@ const useRole = () => {
         }
     });
 
-    return status;
+    return [status, isRolePending];
 };
 
 export default useRole;

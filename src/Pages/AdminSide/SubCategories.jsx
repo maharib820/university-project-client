@@ -5,10 +5,14 @@ import { ToastContainer, toast } from 'react-toastify';
 import Swal from "sweetalert2";
 import moment from "moment";
 import { FaRegEdit } from "react-icons/fa";
+import { useState } from "react";
+import { RiDeleteBin3Fill } from "react-icons/ri";
+import { DataGrid } from '@mui/x-data-grid';
 
 const SubCategories = () => {
 
     const axiosPrivate = useAxiosPrivate();
+    const [mcv, setMcv] = useState(null);
 
     const { data: allMainCategories } = useQuery({
         queryKey: ["allMainCategories"],
@@ -25,6 +29,56 @@ const SubCategories = () => {
             return res.data;
         }
     });
+
+    const columns = [
+        { field: 'maincategory', headerName: 'Main Category', flex: 1 },
+        { field: 'subcategory', headerName: 'Sub Category', flex: 1 },
+        {
+            field: 'subcategoryaddedDate',
+            headerName: 'Created on',
+            flex: 1,
+        },
+        {
+            field: 'update',
+            headerName: 'Update',
+            flex: 1,
+            renderCell: (params) => (
+                <button onClick={() => {
+                    const value = allSubCategories?.filter(fmc => fmc._id === params.row.id);
+                    setMcv(...value)
+                    document.getElementById('my_modal_show').showModal()
+                }}>
+                    <FaRegEdit className="text-xl text-green-600" />
+                </button>
+            ),
+        },
+        {
+            field: 'delete',
+            headerName: 'Delete',
+            flex: 1,
+            renderCell: (params) => (
+                <button onClick={() => {
+                    const value = allSubCategories?.filter(fmc => fmc._id === params.row.id);
+                    console.log(value[0].subcategory);
+                    axiosPrivate.delete(`/deletesubcategory/${value[0].subcategory}`)
+                        .then((res) => {
+                            console.log(res.data);
+                            refetch();
+                        })
+                    console.log(params.row.id)
+                }}>
+                    <RiDeleteBin3Fill className="text-xl text-red-600" />
+                </button>
+            ),
+        },
+    ];
+
+    const rows = allSubCategories?.map((category) => ({
+        id: category._id,
+        maincategory: category.maincategory,
+        subcategory: category.subcategory,
+        subcategoryaddedDate: moment(category.subcategoryaddedDate).format('MMMM Do YYYY, h:mm:ss a'),
+    }));
 
     const handleAddSubCategory = (event) => {
         event.preventDefault();
@@ -62,6 +116,22 @@ const SubCategories = () => {
             })
     }
 
+    const handleUpdate = (event) => {
+        event.preventDefault();
+        axiosPrivate.put(`/updatesubcategory/${mcv.subcategory}`, { subcategory: event.target.subcategory.value })
+            .then(res => {
+                if (res.data.modifiedCount > 0) {
+                    toast("Subcategory updated", { position: toast.POSITION.TOP_CENTER });
+                    refetch();
+                }
+                if (res.data.message === "already exists") {
+                    toast("Already exist", { position: toast.POSITION.TOP_CENTER });
+                    event.target.reset();
+                    refetch();
+                }
+            })
+    }
+
     return (
         <div className="">
             <ToastContainer></ToastContainer>
@@ -82,33 +152,38 @@ const SubCategories = () => {
                 </div>
                 <div className="w-full shadow-lg p-6 bg-white rounded-lg h-fit">
                     <p className="mb-5 font-semibold">All Sub Categories</p>
-                    <div className="overflow-x-auto">
-                        <table className="table">
-                            {/* head */}
-                            <thead>
-                                <tr>
-                                    <th>Main Category</th>
-                                    <th>Sub Category</th>
-                                    <th>Date</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    allSubCategories?.map(category => {
-                                        return <tr key={category?._id}>
-                                            <td>{category?.maincategory}</td>
-                                            <td>{category?.subcategory}</td>
-                                            <td>{moment(category?.subcategoryaddedDate).format("MMM Do YY")}</td>
-                                            <td><button><FaRegEdit className="text-xl"></FaRegEdit></button></td>
-                                        </tr>
-                                    })
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                    {
+                        allSubCategories && allSubCategories.length > 0 ?
+                            <div style={{ height: 400, width: '100%' }}>
+                                <DataGrid
+                                    rows={rows}
+                                    columns={columns}
+                                    pageSize={5}
+                                />
+                            </div> : ""
+                    }
                 </div>
             </div>
+            {/* Modal */}
+            <dialog
+                id="my_modal_show"
+                className="modal"
+            >
+                <div className="modal-box">
+                    <form onSubmit={handleUpdate}>
+                        <label className="form-control w-full">
+                            <div className="label">
+                                <span className="label-text">Main Category name</span>
+                            </div>
+                            <input name="subcategory" defaultValue={mcv?.subcategory} type="text" placeholder="Type here" className="input input-bordered w-full focus:outline-none" />
+                        </label>
+                        <input className="btn mt-3 bg-orange-500 text-white" type="submit" value="Update" />
+                    </form>
+                </div>
+                <form method="dialog" className="modal-backdrop">
+                    <button></button>
+                </form>
+            </dialog>
         </div>
     );
 };

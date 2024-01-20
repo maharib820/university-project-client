@@ -1,14 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import useAxiosPrivate from "../../Hooks/useAxiosPrivate";
 import { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import Swal from "sweetalert2";
 import { useNavigate, useParams } from "react-router-dom";
 
 const UpdateSingleProductDetails = () => {
 
     const params = useParams();
-    // console.log(params.id);
 
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
@@ -20,7 +19,6 @@ const UpdateSingleProductDetails = () => {
             return res.data;
         }
     })
-    // console.log(productInfo);
 
     const [loading, setLoading] = useState(false);
 
@@ -55,20 +53,20 @@ const UpdateSingleProductDetails = () => {
         setLoading(true);
         const form = event.target;
         const maincategory = form.maincategory.value;
-        if (maincategory === "Select Main Category") {
-            setLoading(false);
-            return toast("Select Main Category", { position: toast.POSITION.TOP_CENTER });
-        }
+        // if (maincategory === "Select Main Category") {
+        //     setLoading(false);
+        //     return toast("Select Main Category", { position: toast.POSITION.TOP_CENTER });
+        // }
         const subcategory = form.subcategory.value;
-        if (subcategory === "Select Sub Category") {
-            setLoading(false);
-            return toast("Select Sub Category", { position: toast.POSITION.TOP_CENTER });
-        }
+        // if (subcategory === "Select Sub Category") {
+        //     setLoading(false);
+        //     return toast("Select Sub Category", { position: toast.POSITION.TOP_CENTER });
+        // }
         const subchildcategory = form.subchildcategory.value;
-        if (subchildcategory === "Select Sub Child Category") {
-            setLoading(false);
-            return toast("Select Sub Child Category", { position: toast.POSITION.TOP_CENTER });
-        }
+        // if (subchildcategory === "Select Sub Child Category") {
+        //     setLoading(false);
+        //     return toast("Select Sub Child Category", { position: toast.POSITION.TOP_CENTER });
+        // }
         const productname = form.productname.value;
         const productbrand = form.productbrand.value;
         const productinfo = form.productinfo.value;
@@ -105,56 +103,64 @@ const UpdateSingleProductDetails = () => {
                 <p className="mb-5 font-semibold pb-4 border-b">Update Information</p>
                 <form onSubmit={handleUpdateProduct} className="space-y-5">
                     <div className="flex flex-col lg:flex-row gap-5">
-                        <select style={{ height: '55px' }} onChange={handleMainCategorySelect} defaultValue={productInfo?.maincategory} name="maincategory" className="select select-bordered w-full rounded" required>
-                            <option disabled>Select Main Category</option>
-                            {
-                                allMainCategories?.map(category => <option key={category._id}>{category.maincategory}</option>)
-                            }
-                        </select>
-                        <select style={{ height: '55px' }} onChange={handleSubCategorySelect} defaultValue={"Select Sub Category"} name="subcategory" className="select select-bordered w-full rounded" required>
-                            <option disabled>Select Sub Category</option>
-                            {
-                                subCategories?.map(category => <option key={category._id}>{category.subcategory}</option>)
-                            }
-                        </select>
-                        <select style={{ height: '55px' }} defaultValue={"Select Sub Child Category"} name="subchildcategory" className="select select-bordered w-full rounded" required>
-                            <option disabled>Select Sub Child Category</option>
-                            {
-                                subChildCategories?.map(category => <option key={category._id}>{category.subchildcategory}</option>)
-                            }
-                        </select>
+                        {
+                            productInfo?.maincategory ? <select style={{ height: '55px' }} onChange={handleMainCategorySelect} defaultValue={productInfo?.maincategory} name="maincategory" className="select select-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required>
+                                <option disabled>{productInfo?.maincategory}</option>
+                                {
+                                    allMainCategories?.map(category => <option key={category._id}>{category.maincategory}</option>)
+                                }
+                            </select> : ""
+                        }
+                        {
+                            productInfo?.subcategory ? <select style={{ height: '55px' }} onChange={handleSubCategorySelect} defaultValue={productInfo?.subcategory} name="subcategory" className="select select-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required>
+                                <option disabled>{productInfo?.subcategory}</option>
+                                {
+                                    subCategories?.map(category => <option key={category._id}>{category.subcategory}</option>)
+                                }
+                            </select> : ""
+                        }
+                        {
+                            productInfo?.subchildcategory ? <select style={{ height: '55px' }} defaultValue={productInfo?.subchildcategory} name="subchildcategory" className="select select-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required>
+                                <option disabled>{productInfo?.subchildcategory}</option>
+                                {
+                                    subChildCategories?.map(category => <option key={category._id}>{category.subchildcategory}</option>)
+                                }
+                            </select> : ""
+                        }
                     </div>
                     <div className="flex flex-col lg:flex-row gap-5">
                         <label className="form-control w-full">
                             <div className="label">
                                 <span className="label-text">Product Name</span>
                             </div>
-                            <input defaultValue={productInfo?.productname} name="productname" type="text" placeholder="Type here" className="input input-bordered w-full" required />
+                            <input style={{ height: '55px' }} defaultValue={productInfo?.productname} name="productname" type="text" placeholder="Type here" className="input input-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required />
                         </label>
                         <label className="form-control w-full">
                             <div className="label">
                                 <span className="label-text">Product Brand</span>
                             </div>
-                            <input defaultValue={productInfo?.productbrand} name="productbrand" type="text" placeholder="Type here" className="input input-bordered w-full" required />
+                            <input style={{ height: '55px' }} defaultValue={productInfo?.productbrand} name="productbrand" type="text" placeholder="Type here" className="input input-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required />
                         </label>
                     </div>
-                    <textarea defaultValue={productInfo?.productinfo} name="productinfo" className="textarea textarea-bordered w-full rounded-md" cols="30" rows="3" placeholder="Product Information"></textarea>
+                    <textarea defaultValue={productInfo?.productinfo} name="productinfo" className="textarea textarea-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" cols="30" rows="3" placeholder="Product Information"></textarea>
                     <div className="flex flex-col lg:flex-row gap-5">
                         <label className="form-control w-full">
                             <div className="label">
                                 <span className="label-text">Measurement</span>
                             </div>
-                            <input defaultValue={productInfo?.measurment} name="measurment" type="number" min={1} placeholder="Type here" className="input input-bordered w-full s" required />
+                            <input style={{ height: '55px' }} defaultValue={productInfo?.measurment} name="measurment" type="number" min={1} placeholder="Type here" className="input input-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required />
                         </label>
                         <label className="form-control w-full">
                             <div className="label">
                                 <span className="label-text">Product Status</span>
                             </div>
-                            <select style={{ height: '55px' }} defaultValue={productInfo?.productstatus} name="productstatus" className="select select-bordered w-full rounded" required>
-                                <option disabled>Select Status</option>
-                                <option>Active</option>
-                                <option>Discontinued</option>
-                            </select>
+                            {
+                                productInfo?.productstatus ? <select style={{ height: '55px' }} defaultValue={productInfo?.productstatus} name="productstatus" className="select select-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required>
+                                    <option disabled>{productInfo?.productstatus}</option>
+                                    <option>Active</option>
+                                    <option>Discontinued</option>
+                                </select> : ""
+                            }
                         </label>
                     </div>
                     <div className="flex flex-col lg:flex-row gap-5">
@@ -162,22 +168,22 @@ const UpdateSingleProductDetails = () => {
                             <div className="label">
                                 <span className="label-text">Sell Price</span>
                             </div>
-                            <input defaultValue={productInfo?.sellprice} min={1} name="sellprice" type="number" placeholder="Type here" className="input input-bordered w-full" required />
+                            <input style={{ height: '55px' }} defaultValue={productInfo?.sellprice} min={1} name="sellprice" type="number" placeholder="Type here" className="input input-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required />
                         </label>
                         <label className="form-control w-full">
                             <div className="label">
                                 <span className="label-text">Quantity</span>
                             </div>
-                            <input defaultValue={productInfo?.quantity} name="quantity" type="number" placeholder="Type here" className="input input-bordered w-full" required />
+                            <input style={{ height: '55px' }} defaultValue={productInfo?.quantity} name="quantity" type="number" placeholder="Type here" className="input input-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required />
                         </label>
                         <label className="form-control w-full">
                             <div className="label">
                                 <span className="label-text">Discount</span>
                             </div>
-                            <input defaultValue={productInfo?.productdiscount} min={0} max={100} name="productdiscount" type="number" placeholder="Type here" className="input input-bordered w-full" required />
+                            <input style={{ height: '55px' }} defaultValue={productInfo?.productdiscount} min={0} max={100} name="productdiscount" type="number" placeholder="Type here" className="input input-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" required />
                         </label>
                     </div>
-                    <textarea defaultValue={productInfo?.productdescription} name="productdescription" className="textarea textarea-bordered w-full rounded-md" cols="30" rows="5" placeholder="Product Description" required></textarea>
+                    <textarea defaultValue={productInfo?.productdescription} name="productdescription" className="textarea textarea-bordered w-full rounded focus:outline-none focus:border-[#1976d2] focus:border-2" cols="30" rows="5" placeholder="Product Description" required></textarea>
                     {
                         loading ?
                             <button className="btn h-14 bg-green-500 text-white text-lg rounded-md">

@@ -7,12 +7,12 @@ const AdminNavbar = ({ setIsOpen, isOpenBtn, setIsOpenBtn }) => {
     const { user, loading } = useAuth();
 
     return (
-        <div className={`w-full h-20 bg-white shadow-md flex lg:justify-end items-center px-8 ${!isOpenBtn ? "justify-end" : "justify-between"}`}>
+        <div className={`w-full h-20 bg-white shadow-md flex xl:justify-end items-center px-8 ${!isOpenBtn ? "justify-end" : "justify-between"}`}>
             {
                 isOpenBtn ? <button onClick={() => {
                     setIsOpen(true);
                     setIsOpenBtn(false);
-                }} className="btn btn-square lg:hidden"><MdMenu className="text-3xl"></MdMenu></button> : ""
+                }} className="btn btn-square xl:hidden"><MdMenu className="text-3xl"></MdMenu></button> : ""
             }
             {
                 loading ?

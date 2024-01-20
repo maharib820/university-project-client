@@ -8,11 +8,16 @@ import { LuLayoutDashboard } from "react-icons/lu";
 import { MdOutlineProductionQuantityLimits } from "react-icons/md";
 import { IoIosArrowForward } from "react-icons/io";
 import { RiMenuAddFill } from "react-icons/ri";
-// import { BiPurchaseTag } from "react-icons/bi";
+import { BiPurchaseTag } from "react-icons/bi";
 import { FaUsersCog } from "react-icons/fa";
-import { TbReorder } from "react-icons/tb";
+import useRole from "../Hooks/useRole"
+import { FaRegImages } from "react-icons/fa6";
+// import { HiMiniReceiptPercent } from "react-icons/hi2";
 
 const Dashboard = () => {
+
+    const [status] = useRole();
+    // console.log(role);
 
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenBtn, setIsOpenBtn] = useState(true);
@@ -33,7 +38,7 @@ const Dashboard = () => {
 
     return (
         <div className="h-screen overflow-hidden flex relative">
-            <div className={`${isOpen ? "" : "hidden lg:flex"}  w-72 bg-[#232b35] h-full flex absolute lg:relative z-50`}>
+            <div className={`${isOpen ? "" : "hidden xl:flex"}  w-72 bg-[#232b35] h-full flex absolute xl:relative z-50`}>
                 <div className="h-full w-full flex flex-col">
                     <div className="h-20 px-5 bg-[#181d24] flex justify-between items-center">
                         <Logo></Logo>
@@ -41,7 +46,7 @@ const Dashboard = () => {
                             onClick={() => {
                                 setIsOpen(false);
                                 setIsOpenBtn(true);
-                            }} className="btn btn-square lg:hidden"><ImCancelCircle className="text-3xl"></ImCancelCircle>
+                            }} className="btn btn-square xl:hidden"><ImCancelCircle className="text-3xl"></ImCancelCircle>
                         </button>
                     </div>
                     <div className="flex-grow mb-4 flex flex-col gap-5 justify-between text-white overflow-hidden">
@@ -51,7 +56,7 @@ const Dashboard = () => {
                             <Link to={"admindashboard"}><button className={`flex items-center gap-2 mb-2 hover:bg-[#181d24] w-full px-2 py-3 rounded-md ${location.pathname === "/dashboard/admindashboard" ? "bg-[#181d24]" : ""}`}><LuLayoutDashboard></LuLayoutDashboard>Dashboard</button></Link>
 
                             {/* Orders */}
-                            <Link to={"productordersbyuser"}><button className={`flex items-center gap-2 mb-2 hover:bg-[#181d24] w-full px-2 py-3 rounded-md ${location.pathname === "/dashboard/productordersbyuser" ? "bg-[#181d24]" : ""}`}><TbReorder></TbReorder>Orders</button></Link>
+                            <Link to={"productordersbyuser"}><button className={`flex items-center gap-2 mb-2 hover:bg-[#181d24] w-full px-2 py-3 rounded-md ${location.pathname === "/dashboard/productordersbyuser" ? "bg-[#181d24]" : ""}`}><BiPurchaseTag></BiPurchaseTag>Orders</button></Link>
 
                             {/* Products */}
                             <button onClick={handleProductShowing} className={`flex justify-between items-center gap-3 mb-2 hover:bg-[#181d24] w-full px-2 py-3 rounded-md `}><div className="flex items-center gap-2"><MdOutlineProductionQuantityLimits></MdOutlineProductionQuantityLimits>Product</div><IoIosArrowForward></IoIosArrowForward></button>
@@ -67,11 +72,6 @@ const Dashboard = () => {
                             {/* Categories */}
                             <button onClick={handleCategoryShowing} className={`flex justify-between items-center gap-3 mb-2 hover:bg-[#181d24] w-full px-2 py-3 rounded-md`}><div className="flex items-center gap-2"><RiMenuAddFill></RiMenuAddFill>Categories</div><IoIosArrowForward></IoIosArrowForward></button>
                             <div className={`ml-6 space-y-2 mb-2 ${showCategoryPart ? "" : "hidden"}`}>
-                                <Link to={"allcategories"}>
-                                    <li className={`px-2 py-2 rounded-md ${location.pathname === "/dashboard/allcategories" ? "bg-[#181d24]" : ""}`}>
-                                        All Categories
-                                    </li>
-                                </Link>
                                 <Link to={"maincategories"}>
                                     <li className={`px-2 py-2 rounded-md ${location.pathname === "/dashboard/maincategories" ? "bg-[#181d24]" : ""}`}>
                                         Main Categories
@@ -94,7 +94,13 @@ const Dashboard = () => {
                             <Link to={"orders"}><button className={`flex items-center gap-2 mb-2 hover:bg-[#181d24] w-full px-2 py-3 rounded-md ${location.pathname === "/dashboard/orders" ? "bg-[#181d24]" : ""}`}><BiPurchaseTag></BiPurchaseTag>Orders</button></Link> */}
 
                             {/* Manage Users */}
-                            <Link to={"manageusers"}><button className={`flex items-center gap-2 mb-2 hover:bg-[#181d24] w-full px-2 py-3 rounded-md ${location.pathname === "/dashboard/manageusers" ? "bg-[#181d24]" : ""}`}><FaUsersCog></FaUsersCog>Manage Users</button></Link>
+                            <Link to={"manageusers"}><button className={`flex items-center gap-2 mb-2 hover:bg-[#181d24] w-full px-2 py-3 rounded-md ${location.pathname === "/dashboard/manageusers" ? "bg-[#181d24]" : ""} ${status?.status === "admin" ? "" : "hidden"}`}><FaUsersCog></FaUsersCog>Manage Users</button></Link>
+
+                            {/* Manage Discount */}
+                            {/* <Link to={"managediscount"}><button className={`flex items-center gap-2 mb-2 hover:bg-[#181d24] w-full px-2 py-3 rounded-md ${location.pathname === "/dashboard/managediscount" ? "bg-[#181d24]" : ""}`}><HiMiniReceiptPercent></HiMiniReceiptPercent>Manage Discount</button></Link> */}
+
+                            {/* Manage Home Slider */}
+                            <Link to={"homepageslider"}><button className={`flex items-center gap-2 mb-2 hover:bg-[#181d24] w-full px-2 py-3 rounded-md ${location.pathname === "/dashboard/homepageslider" ? "bg-[#181d24]" : ""}`}><FaRegImages></FaRegImages>Home Slider</button></Link>
                         </div>
                         <div className="border-t-2 px-5 pt-5">
                             <Link to={"/"}><button className="flex items-center gap-2 mb-2 bg-[#181d24] w-full px-2 py-3 rounded-md"><IoMdHome></IoMdHome>Home</button></Link>

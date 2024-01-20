@@ -36,7 +36,7 @@ const CheckoutForm = () => {
         }
     }, [axiosPrivate, totalAmount])
 
-    const {data: userData} = useQuery({
+    const { data: userData } = useQuery({
         queryKey: ["userData", user?.email],
         queryFn: async () => {
             const res = await axiosPrivate(`/userdatas/${user?.email}`)
@@ -94,13 +94,13 @@ const CheckoutForm = () => {
                     transactionId: paymentIntent.id,
                     time: new Date(),
                     amountpaid: totalAmount,
-                    cartId: cartItems,
-                    productsId: cartItems.map(item => item.cartProductId),
-                    productQuantity: cartItems.map(item => item.totalSelectedItems),
-                    status: "pending",
-                    userDetails: userData
+                    productsDetails: cartItems.map(item => {
+                        return { cartProductId: item.cartProductId, totalSelectedItems: item.totalSelectedItems }
+                    }),
+                    status: "pending"
                 }
-                const res = await axiosPrivate.post(`/buyingpayment/${user.email}`, paymentHistory)
+                console.log(paymentHistory);
+                const res = await axiosPrivate.post(`/buyingpayment/${user?.email}`, paymentHistory)
                 // console.log(res.data.result.insertedId);
                 if (res.data.result.insertedId) {
                     refetchCartItems();
@@ -117,8 +117,7 @@ const CheckoutForm = () => {
         }
     }
 
-    console.log(userData);
-
+    // console.log(userData);
 
     return (
         <div>
@@ -128,6 +127,7 @@ const CheckoutForm = () => {
                         style: {
                             base: {
                                 fontSize: '16px',
+                                backgroundColor: "#ffffff",
                                 color: '#424770',
                                 '::placeholder': {
                                     color: '#aab7c4',

@@ -1,16 +1,19 @@
 import { TextField } from "@mui/material";
 import authimage from "../../../../public/Authimage.png"
 import { FcGoogle } from "react-icons/fc";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import useAuth from "../../../Hooks/useAuth";
 import Swal from "sweetalert2";
+import useAxiosPrivate from "../../../Hooks/useAxiosPrivate";
 
 const Login = () => {
 
     const [loading, setLoading] = useState(false);
-    const { loginUser } = useAuth();
+    const { loginUser, googleSignIn } = useAuth();
     const navigate = useNavigate();
+    const axiosPrivate = useAxiosPrivate();
+    const location = useLocation();
 
     const handleLoginForm = (event) => {
         event.preventDefault();
@@ -28,7 +31,7 @@ const Login = () => {
                     timer: 1500
                 });
                 setLoading(false);
-                navigate("/")
+                navigate(location?.state ? location.state : "/")
             })
             .catch(() => {
                 Swal.fire({
@@ -39,6 +42,22 @@ const Login = () => {
                     timer: 1500
                 });
                 setLoading(false);
+            })
+    }
+
+    const handleGoogleAccount = () => {
+        googleSignIn()
+            .then(r => {
+                const userData = { name: r.user.displayName, email: r.user.email, profilePicture: r.user.photoURL, userStatus: "user", registeredIn: new Date() };
+                axiosPrivate.post("/addUser", userData)
+                    .then(res => {
+                        if (res.data.insertedId || res.data.message === "user already exists") {
+                            navigate(location?.state ? location.state : "/")
+                        }
+                    })
+            })
+            .catch(error => {
+                console.log(error);
             })
     }
 
@@ -66,7 +85,7 @@ const Login = () => {
                     <div className="divider">OR</div>
                 </form>
                 <div className="flex justify-center mt-4">
-                    <button className="w-5/6 btn border-2 border-[#2a55e5] rounded-none"><FcGoogle className="text-2xl"></FcGoogle>GOOGLE</button>
+                    <button onClick={handleGoogleAccount} className="w-5/6 btn border-2 border-[#2a55e5] rounded-none"><FcGoogle className="text-2xl"></FcGoogle>GOOGLE</button>
                 </div>
                 <h3 className="text-center mt-10 absolute bottom-10 left-1/2 -translate-x-1/2">New here? <Link to={"/register"}><span className="font-bold text-[#2a55e5]">Register</span></Link></h3>
             </div>

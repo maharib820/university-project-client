@@ -28,6 +28,11 @@ import UserOrderPage from "../Pages/UserSide/UserOrderPage";
 import ProductOrdersByUser from "../Pages/AdminSide/ProductOrdersByUser";
 import UpdateSingleProductDetails from "../Pages/AdminSide/UpdateSingleProductDetails";
 import UserProfile from "../Pages/UserSide/UserProfile";
+import HomePageSlider from "../Pages/AdminSide/HomePageSlider";
+import OrderFullInfo from "../Pages/UserSide/OrderFullInfo";
+import ManageDiscount from "../Pages/AdminSide/ManageDiscount";
+import PrivateRoute from "./PrivateRoute";
+import AdminRoute from "./AdminRoute";
 
 const router = createBrowserRouter([
     {
@@ -68,27 +73,31 @@ const router = createBrowserRouter([
             },
             {
                 path: "allwishlistDetails",
-                element: <AllWishlistDetails></AllWishlistDetails>
+                element: <PrivateRoute><AllWishlistDetails></AllWishlistDetails></PrivateRoute>
             },
             {
                 path: "payment",
-                element: <Payment></Payment>
+                element: <PrivateRoute><Payment></Payment></PrivateRoute>
             },
             {
                 path: "viewcartpage",
-                element: <ViewCartPage></ViewCartPage>
+                element: <PrivateRoute><ViewCartPage></ViewCartPage></PrivateRoute>
             },
             {
                 path: "paymentmoney",
-                element: <PaymentMoney></PaymentMoney>
+                element: <PrivateRoute><PaymentMoney></PaymentMoney></PrivateRoute>
             },
             {
                 path: "userorderpage",
-                element: <UserOrderPage></UserOrderPage>
+                element: <PrivateRoute><UserOrderPage></UserOrderPage></PrivateRoute>
             },
             {
                 path: "userprofile",
-                element: <UserProfile></UserProfile>
+                element: <PrivateRoute><UserProfile></UserProfile></PrivateRoute>
+            },
+            {
+                path: "orderfullinfo/:id",
+                element: <PrivateRoute><OrderFullInfo></OrderFullInfo></PrivateRoute>, 
             }
         ],
     },
@@ -98,47 +107,55 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "admindashboard",
-                element: <AdminDashboard></AdminDashboard>
+                element: <AdminRoute><AdminDashboard></AdminDashboard></AdminRoute>
             },
             {
                 path: "addnewproduct",
-                element: <AddNewProduct></AddNewProduct>
+                element: <AdminRoute><AddNewProduct></AddNewProduct></AdminRoute>
             },
             {
                 path: "allproduct",
-                element: <AllProduct></AllProduct>
+                element: <AdminRoute><AllProduct></AllProduct></AdminRoute>
             },
             {
                 path: "allcategories",
-                element: <AllCategories></AllCategories>
+                element: <AdminRoute><AllCategories></AllCategories></AdminRoute>
             },
             {
                 path: "maincategories",
-                element: <MainCategories></MainCategories>
+                element: <AdminRoute><MainCategories></MainCategories></AdminRoute>
             },
             {
                 path: "subcategories",
-                element: <SubCategories></SubCategories>
+                element: <AdminRoute><SubCategories></SubCategories></AdminRoute>
             },
             {
                 path: "subchildcategories",
-                element: <SubChildCategories></SubChildCategories>
+                element: <AdminRoute><SubChildCategories></SubChildCategories></AdminRoute>
             },
             {
                 path: "orders",
-                element: <Orders></Orders>
+                element: <AdminRoute><Orders></Orders></AdminRoute>
             },
             {
                 path: "manageusers",
-                element: <ManageUsers></ManageUsers>
+                element: <AdminRoute><ManageUsers></ManageUsers></AdminRoute>
             },
             {
                 path: "productordersbyuser",
-                element: <ProductOrdersByUser></ProductOrdersByUser>
+                element: <AdminRoute><ProductOrdersByUser></ProductOrdersByUser></AdminRoute>
             },
             {
                 path: "updatesingleproductdetails/:id",
-                element: <UpdateSingleProductDetails></UpdateSingleProductDetails>
+                element: <AdminRoute><UpdateSingleProductDetails></UpdateSingleProductDetails></AdminRoute>
+            },
+            {
+                path: "homepageslider",
+                element: <AdminRoute><HomePageSlider></HomePageSlider></AdminRoute>
+            },
+            {
+                path: "managediscount",
+                element: <AdminRoute><ManageDiscount></ManageDiscount></AdminRoute>
             }
         ]
     }
